@@ -27,8 +27,11 @@ inSim.on(PacketType.ISP_VER, (packet) => {
 
   // Handle typed commands
   inSim.on(PacketType.ISP_MSO, (packet) => {
-    if (packet.Msg.startsWith(COMMAND_PREFIX)) {
-      switch (packet.Msg.slice(1)) {
+    // packet.Msg contains the player name before the message itself
+    const text = packet.Msg.slice(packet.TextStart);
+
+    if (text.startsWith(COMMAND_PREFIX)) {
+      switch (text.slice(1)) {
         case "high":
           {
             inSim.send(

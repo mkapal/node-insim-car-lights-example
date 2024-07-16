@@ -10,6 +10,8 @@ import {
 
 const inSim = new InSim();
 
+const COMMAND_PREFIX = "!";
+
 inSim.connect({
   IName: "Node InSim App",
   Host: "127.0.0.1",
@@ -17,30 +19,41 @@ inSim.connect({
   ReqI: IS_ISI_ReqI.SEND_VERSION,
   Admin: "",
   Flags: InSimFlags.ISF_LOCAL,
+  Prefix: COMMAND_PREFIX,
 });
 
 inSim.on(PacketType.ISP_VER, (packet) => {
   console.log(`Connected to LFS ${packet.Product} ${packet.Version}`);
 
-  setInterval(() => {
-    inSim.send(
-      new IS_SMALL({
-        SubT: SmallType.SMALL_LCL,
-        UVal: LocalCarLights.LIGHTS_OFF,
-      }),
-    );
-  }, 2000);
+  // Handle typed commands
+  inSim.on(PacketType.ISP_MSO, (packet) => {
+    const command = packet.Msg.slice(packet.TextStart);
 
-  setTimeout(() => {
-    setInterval(() => {
-      inSim.send(
-        new IS_SMALL({
-          SubT: SmallType.SMALL_LCL,
-          UVal: LocalCarLights.LIGHTS_HIGH,
-        }),
-      );
-    }, 2000);
-  }, 1000);
+    if (command.startsWith(COMMAND_PREFIX)) {
+      switch (command.slice(1)) {
+        case "lights on":
+          {
+            inSim.send(
+              new IS_SMALL({
+                SubT: SmallType.SMALL_LCL,
+                UVal: LocalCarLights.LIGHTS_HIGH,
+              }),
+            );
+          }
+          break;
+        case "lights off":
+          {
+            inSim.send(
+              new IS_SMALL({
+                SubT: SmallType.SMALL_LCL,
+                UVal: LocalCarLights.LIGHTS_OFF,
+              }),
+            );
+          }
+          break;
+      }
+    }
+  });
 });
 
 process.on("uncaughtException", (error) => {

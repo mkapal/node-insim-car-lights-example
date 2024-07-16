@@ -30,6 +30,8 @@ inSim.on(PacketType.ISP_VER, (packet) => {
     // packet.Msg contains the player name before the message itself
     const text = packet.Msg.slice(packet.TextStart);
 
+    console.log("Text", text);
+
     if (text.startsWith(COMMAND_PREFIX)) {
       switch (text.slice(1)) {
         case "high":

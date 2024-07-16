@@ -28,7 +28,7 @@ inSim.on(PacketType.ISP_VER, (packet) => {
   // Handle typed commands
   inSim.on(PacketType.ISP_MSO, (packet) => {
     // packet.Msg contains the player name before the message itself
-    const text = packet.Msg.slice(packet.TextStart);
+    const text = packet.Msg.slice(packet.TextStart - 1);
 
     console.log("Text", text);
 
